@@ -1,0 +1,1 @@
+// Bruke func til å gå gjennom dataen og inserte i DB 
