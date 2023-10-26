@@ -20,7 +20,6 @@ export interface UserModelInterface extends mongoose.Model<UserDoc> {
 const userSchema = new mongoose.Schema<UserDoc> (
     {
         _id: {
-            type: ObjectId,
             required: true
         },
         has_labels: {
