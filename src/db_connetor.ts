@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const initializeConfig = () => {
+export const initializeConfig = () => {
     mongoose.connect("mongodb://root:mongo-pass@localhost:27017/?authMechanism=DEFAULT")
         .then(() => {
             console.log("Connected")
@@ -9,5 +9,3 @@ const initializeConfig = () => {
             console.log(error)
         })
 };
-
-initializeConfig();
