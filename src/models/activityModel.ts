@@ -37,7 +37,7 @@ const activitySchema = new mongoose.Schema<ActivityDoc> (
             }
         ]
     },
-    {collection: "activity", _id: false}
+    { collection: "activity", _id: false }
 )
 
 activitySchema.statics.build = (attr: IActivity) => {
