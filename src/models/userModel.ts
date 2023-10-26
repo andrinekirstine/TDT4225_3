@@ -10,7 +10,7 @@ interface IUser {
 export interface UserDoc extends mongoose.Document {
     _id: IUser["_id"],
     has_labels: IUser["has_labels"],
-    activity_ids: IUser["has_labels"]
+    activity_ids: IUser["activity_ids"]
 }
 
 export interface UserModelInterface extends mongoose.Model<UserDoc> {
