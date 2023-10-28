@@ -1,4 +1,3 @@
-import { StringExpression } from "mongoose";
 import User, { IUser, UserDoc } from "../models/userModel";
 
 const labelList: string[] = [ "010", "020", "021", "052", "053", "056", "058", "059", "060", "062",
