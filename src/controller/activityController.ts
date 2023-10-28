@@ -5,6 +5,8 @@ export const addActivity = async(tpId: string[]) => {
     if(tpId === undefined || tpId.length <= 0) {
         return console.error("Missing tp ids")
     }
+
+    // need to sort by date
     const tps: TrackPointDoc[] = await TrackPoint.find({ '_id': { $in: tpId}}).exec()
     if(tps.length <= 0) {
         return console.error("Can not find tps")
