@@ -1,9 +1,12 @@
 import { walk } from "node-os-walk";
 import path from "path";
 import fs from 'fs';
-import TrackPoint, { ITrackPoint, TrackPointModelInterface } from "./models/trackPointModel";
+import { ITrackPoint } from "./models/trackPointModel";
 import { addTrackPoints } from "./controller/trackPointController";
 import { addActivity } from "./controller/activityController";
+import { addActivityToUser, addUser } from "./controller/userController";
+import { initializeConfig } from "./db_connetor";
+import { ObjectId } from "mongodb";
 
 const PROCESSED_FILES_PATH: string = ".processed_files"
 
@@ -11,6 +14,8 @@ interface ActivityPath {
     user: string,
     path: string
 }
+
+initializeConfig()
 
 async function walkDataset(rootPath: string): Promise<ActivityPath[]> {
     let activities: ActivityPath[] = []
@@ -83,27 +88,30 @@ async function main() {
 
         console.log("Processing:", activity.user, activity.path);
 
-        const content = fs.readFileSync(activity.user, "utf-8")   
+        const user = await addUser(activity.user, userHasLabels)
+        
+
+        const content = fs.readFileSync(activity.path, "utf-8")   
         const lines = content.split('\n');
         const tpData: ITrackPoint[] = []
 
         for (const line of lines) {
             const [lat, lon, altitude, dateStr] = line.trim().split(',');
 
-            const latitude = parseFloat(lat);
-            const longitude = parseFloat(lon);
-            const alt = parseFloat(altitude);
-            const date = new Date(dateStr);
+            const latitude1 = parseFloat(lat);
+            const longitude1 = parseFloat(lon);
+            const alt1 = parseFloat(altitude);
+            const date1 = new Date(dateStr);
+            const _id = new ObjectId()
 
-            if (!isNaN(latitude) && !isNaN(longitude) && !isNaN(alt) && !isNaN(date.getTime())) {
-                tpData.push({ lat: latitude, lon: longitude, altitude: alt, date });
-            }
+            tpData.push({ _id: _id, lat: latitude1, lon: longitude1, altitude: alt1, date: date1 });
         }
         
-        const trackPoint_ids: string[] = await addTrackPoints(tpData)
-        if(trackPoint_ids.length > 0) {
-            const activity_id: string = await addActivity(trackPoint_ids)            
-        }
+        const trackPoint_ids = await addTrackPoints(tpData)
+        
+        const activity_id: ObjectId = await addActivity(trackPoint_ids)
+        const a = activity_id.toString()
+        await addActivityToUser(activity.user, a);
 
 
         // 2: Create an activity with the trackpoint ids and get the activity ID.

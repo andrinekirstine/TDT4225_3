@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import User, { IUser, UserDoc } from "../models/userModel";
 
 const labelList: string[] = [ "010", "020", "021", "052", "053", "056", "058", "059", "060", "062",
@@ -9,24 +10,39 @@ const labelList: string[] = [ "010", "020", "021", "052", "053", "056", "058", "
     "153", "154", "161", "163", "167", "170", "174", "175", "179"];
 
 
-export const addUsers = async(userId: string, activityIds: string[]) => {
+export const addUser = async(userId: string, userHasLabels: boolean) => {
     if (userId === undefined || !userId) {
-        return console.log("Need userId")
-    }
-    if (activityIds === undefined || activityIds.length <= 0) {
-        return console.error("Need activity ids")
+        throw new Error("error")
     }
 
-    const labels: boolean = labelList.includes(userId)
+    const existUser: UserDoc | null = await User.findById({'_id': userId})
+
+    if(existUser !== null) {
+        return 
+    }
 
     const newUser: IUser = {
-        _id: userId,
-        has_labels: labels,
-        activity_ids: activityIds
+        _id:  userId,
+        has_labels: userHasLabels,
+        activity_ids: []
     }
 
     const resUser: UserDoc = User.build(newUser);  
-    resUser.save()
+    await resUser.save()
     
-    return console.log(`${resUser._id} is added`)
+    return resUser
 };
+
+export const addActivityToUser = async (userId: string, activity_id: string) => {
+    if (userId === undefined || !userId) {
+        throw new Error("error")
+    }
+
+    const updateUser: UserDoc | null = await User.findByIdAndUpdate({'_id': userId}, { $addToSet: {activity_ids: activity_id}})
+
+    if(updateUser === null) {
+        throw new Error("error")
+    }
+    
+    return activity_id
+}

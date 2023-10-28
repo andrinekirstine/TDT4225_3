@@ -1,13 +1,16 @@
+import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
 
 export interface IActivity {
+    _id: ObjectId,
     transportation_mode?: string,
     start_date_time: Date,
     end_date_time: Date,
-    trackpoint_ids: string[]
+    trackpoint_ids: ObjectId[]
 }
 
 export interface ActivityDoc extends mongoose.Document {
+    _id: IActivity["_id"],
     transportation_mode: IActivity["transportation_mode"],
     start_date_time: IActivity["start_date_time"],
     end_date_time: IActivity["end_date_time"],
@@ -20,6 +23,9 @@ export interface ActivityModelInterface extends mongoose.Model<ActivityDoc> {
 
 const activitySchema = new mongoose.Schema<ActivityDoc> (
     {
+        _id: {
+            type: ObjectId
+        },
         transportation_mode: {
             type: String,
             required: false
@@ -34,7 +40,7 @@ const activitySchema = new mongoose.Schema<ActivityDoc> (
         },
         trackpoint_ids: [
             {
-                type: String
+                type: ObjectId
             }
         ]
     },

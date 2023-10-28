@@ -1,28 +1,21 @@
+import { ObjectId } from "mongodb";
 import Activity, { ActivityDoc, IActivity } from "../models/activityModel";
 import TrackPoint, { TrackPointDoc } from "../models/trackPointModel";
 
-export const addActivity = async(tpId: string[]) => {
-    if(tpId === undefined || tpId.length <= 0) {
-        return console.error("Missing tp ids")
-    }
-
-    // need to sort by date
-    const tps: TrackPointDoc[] = await TrackPoint.find({ '_id': { $in: tpId}}).exec()
-    if(tps.length <= 0) {
-        return console.error("Can not find tps")
-    }
-
-    const newActivity: IActivity = {
-        transportation_mode: undefined,
+export const addActivity = async(tps: TrackPointDoc[]) => {
+    const tpId: ObjectId[] = tps.map(t => t._id)
+    const resActivity: ActivityDoc = Activity.build({
+        _id: new ObjectId(),
         start_date_time: tps[0].date,
-        end_date_time: tps[-1].date,
+        end_date_time: tps[tps.length-1].date,
         trackpoint_ids: tpId
-    }
+    })
+    await resActivity.save()
 
-    const resActivity: ActivityDoc = await Activity.build(newActivity)
-    resActivity.save()
+    const id: ObjectId = resActivity._id
   
-    return resActivity._id
+    return id
+    
 };
 
 interface Labels {

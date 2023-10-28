@@ -2,13 +2,12 @@ import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
 
 export interface IUser {
-    _id: String,
+    _id: string,
     has_labels: boolean,
     activity_ids: string[]
 }
 
 export interface UserDoc extends mongoose.Document {
-    _id: IUser["_id"],
     has_labels: IUser["has_labels"],
     activity_ids: IUser["activity_ids"]
 }
@@ -20,6 +19,7 @@ export interface UserModelInterface extends mongoose.Model<UserDoc> {
 const userSchema = new mongoose.Schema<UserDoc> (
     {
         _id: {
+            type: String,
             required: true
         },
         has_labels: {
@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema<UserDoc> (
             }
         ]
     },
-    {collection: "user", _id: false}
+    {collection: "user"}
 )
 
 userSchema.statics.build = (attr: IUser) => {

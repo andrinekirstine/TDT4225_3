@@ -1,6 +1,8 @@
+import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
 
 export interface ITrackPoint {
+    _id: ObjectId,
     lat: number, 
     lon: number,
     altitude: number,
@@ -8,6 +10,7 @@ export interface ITrackPoint {
 }
 
 export interface TrackPointDoc extends mongoose.Document {
+    _id: ITrackPoint["_id"],
     lat: ITrackPoint["lat"],
     lon: ITrackPoint["lon"],
     altitude: ITrackPoint["altitude"],
@@ -20,6 +23,9 @@ export interface TrackPointModelInterface extends mongoose.Model<TrackPointDoc> 
 
 const trackPointSchema = new mongoose.Schema<TrackPointDoc> (
     {
+        _id: {
+            type: ObjectId
+        },
         lat: {
             type: Number,
             required: true
