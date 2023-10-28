@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-interface ITrackPoint {
+export interface ITrackPoint {
     lat: number, 
     lon: number,
     altitude: number,

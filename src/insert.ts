@@ -1,6 +1,9 @@
 import { walk } from "node-os-walk";
 import path from "path";
 import fs from 'fs';
+import TrackPoint, { ITrackPoint, TrackPointModelInterface } from "./models/trackPointModel";
+import { addTrackPoints } from "./controller/trackPointController";
+import { addActivity } from "./controller/activityController";
 
 const PROCESSED_FILES_PATH: string = ".processed_files"
 
@@ -79,11 +82,30 @@ async function main() {
         const userHasLabels: boolean = labelList.includes(activity.user);
 
         console.log("Processing:", activity.user, activity.path);
-        // 0: Read file and create objects from the text. 
-        //      tips: fs.readSync(user.path, "utf8")
 
-        // 1: Create trackpoints and get their corresponding IDs.
+        const content = fs.readFileSync(activity.user, "utf-8")   
+        const lines = content.split('\n');
+        const tpData: ITrackPoint[] = []
+
+        for (const line of lines) {
+            const [lat, lon, altitude, dateStr] = line.trim().split(',');
+
+            const latitude = parseFloat(lat);
+            const longitude = parseFloat(lon);
+            const alt = parseFloat(altitude);
+            const date = new Date(dateStr);
+
+            if (!isNaN(latitude) && !isNaN(longitude) && !isNaN(alt) && !isNaN(date.getTime())) {
+                tpData.push({ lat: latitude, lon: longitude, altitude: alt, date });
+            }
+        }
         
+        const trackPoint_ids: string[] = await addTrackPoints(tpData)
+        if(trackPoint_ids.length > 0) {
+            const activity_id: string = await addActivity(trackPoint_ids)            
+        }
+
+
         // 2: Create an activity with the trackpoint ids and get the activity ID.
 
         // 3: Create the user if it does not exist and add the activity to it.

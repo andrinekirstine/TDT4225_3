@@ -1,19 +1,19 @@
-import TrackPoint, { TrackPointDoc } from "../models/trackPointModel";
+import TrackPoint, { ITrackPoint, TrackPointDoc } from "../models/trackPointModel";
 
-export const addTrackPoints = async(trackPoints: TrackPointDoc[]) => {
+export const addTrackPoints = async(trackPoints: ITrackPoint[]) => {
     if(trackPoints.length === 0 || !trackPoints) {
-        return console.log("Need an input")
+        throw new Error("error")
     }
 
     const tp: TrackPointDoc[] = await TrackPoint.insertMany(trackPoints)
     
     if(tp.length === 0) {
-        return console.log("Error no TP added")
+        throw new Error("error")
     }
     const id: string[] = tp.map(t => t._id)
 
     if(id.length === 0) {
-        return console.log("Error can not find _IDs")
+        throw new Error("error")
     }
 
     return id
