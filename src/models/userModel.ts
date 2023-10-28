@@ -1,8 +1,8 @@
 import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
 
-interface IUser {
-    _id: ObjectId,
+export interface IUser {
+    _id: String,
     has_labels: boolean,
     activity_ids: string[]
 }

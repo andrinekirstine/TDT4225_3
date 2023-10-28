@@ -1,6 +1,6 @@
 import TrackPoint, { TrackPointDoc } from "../models/trackPointModel";
 
-const addTrackPoints = async(trackPoints: TrackPointDoc[]) => {
+export const addTrackPoints = async(trackPoints: TrackPointDoc[]) => {
     if(trackPoints.length === 0 || !trackPoints) {
         return console.log("Need an input")
     }

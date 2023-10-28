@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
-interface IActivity {
-    transportation_mode: string,
+export interface IActivity {
+    transportation_mode?: string,
     start_date_time: Date,
     end_date_time: Date,
     trackpoint_ids: string[]
@@ -21,7 +21,8 @@ export interface ActivityModelInterface extends mongoose.Model<ActivityDoc> {
 const activitySchema = new mongoose.Schema<ActivityDoc> (
     {
         transportation_mode: {
-            type: String
+            type: String,
+            required: false
         },
         start_date_time: {
             type: Date,

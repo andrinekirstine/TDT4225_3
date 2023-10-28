@@ -1,12 +1,21 @@
-import User, { UserDoc } from "../models/userModel";
+import User, { IUser, UserDoc } from "../models/userModel";
 
-const addUsers = async(reqUser: UserDoc) => {
-    if (reqUser === undefined || !reqUser) {
-        return console.log("Need an input")
+export const addUsers = async(userId: string, labels: boolean, activityIds: string[]) => {
+    if (userId === undefined || !userId) {
+        return console.log("Need userId")
+    }
+    if (activityIds === undefined || activityIds.length <= 0) {
+        return console.error("Need activity ids")
     }
 
-    const resUser: UserDoc = User.build(reqUser);  
+    const newUser: IUser = {
+        _id: userId,
+        has_labels: labels,
+        activity_ids: activityIds
+    }
+
+    const resUser: UserDoc = User.build(newUser);  
     resUser.save()
     
-    return resUser._id
+    return console.log(`${resUser._id} is added`)
 };
