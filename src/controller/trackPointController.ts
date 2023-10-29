@@ -6,7 +6,7 @@ export const addTrackPoints = async(trackPoints: ITrackPoint[]) => {
         return []
     }
 
-    const tp = await TrackPoint.insertMany(trackPoints)
+    const tp: TrackPointDoc[] = await TrackPoint.insertMany(trackPoints)
 
     if(tp.length === 0) {
         return []

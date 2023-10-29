@@ -10,7 +10,7 @@ const labelList: string[] = [ "010", "020", "021", "052", "053", "056", "058", "
     "153", "154", "161", "163", "167", "170", "174", "175", "179"];
 
 
-export const addUser = async(userId: string, userHasLabels: boolean) => {
+export const addUser = async(userId: string) => {
     if (userId === undefined || !userId) {
         throw new Error("error")
     }
@@ -19,6 +19,12 @@ export const addUser = async(userId: string, userHasLabels: boolean) => {
 
     if(existUser !== null) {
         return 
+    }
+
+    let userHasLabels = false
+
+    if(labelList.includes(userId)) {
+        userHasLabels = true
     }
 
     const newUser: IUser = {
@@ -45,4 +51,18 @@ export const addActivityToUser = async (userId: string, activity_id: string) => 
     }
     
     return activity_id
+}
+
+export const findUsers = async () => {
+    //console.log("Finding users...")
+    const labeledUsers: UserDoc[] = await User.find({ '_id': labelList }).exec()
+    //console.log(labeledUsers.length)
+    return labeledUsers;
+}
+
+export const updateHasLabel = async () => {
+    for (const user of labelList) {
+        const updatedUser: UserDoc | null = await User.findByIdAndUpdate({ '_id': user }, {"has_labels": true}).exec()
+        //return console.log(updatedUser?._id, updatedUser?.has_labels) 
+    }
 }

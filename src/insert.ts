@@ -3,10 +3,11 @@ import path from "path";
 import fs from 'fs';
 import { ITrackPoint } from "./models/trackPointModel";
 import { addTrackPoints } from "./controller/trackPointController";
-import { addActivity } from "./controller/activityController";
-import { addActivityToUser, addUser } from "./controller/userController";
+import { Labels, addActivity, setTransport } from "./controller/activityController";
+import { addActivityToUser, addUser, findUsers, updateHasLabel } from "./controller/userController";
 import { initializeConfig } from "./db_connetor";
 import { ObjectId } from "mongodb";
+import { UserDoc } from "./models/userModel";
 
 const PROCESSED_FILES_PATH: string = ".processed_files"
 
@@ -38,12 +39,19 @@ async function walkDataset(rootPath: string): Promise<ActivityPath[]> {
       return activities;
 }
 
-async function getLabels(user: string, rootPath: string): Promise<string | null> {
-    const absolutePath = path.resolve(rootPath, user);
+async function getLabels(user: string, rootPath: string): Promise<Labels[] | null> {
+    const absolutePath = path.resolve(rootPath, user, "labels.txt");
     if (!fs.existsSync(absolutePath)) {
         return null;
     }
-    return fs.readFileSync(absolutePath, "utf8");
+    return fs.readFileSync(absolutePath, "utf8").split("\r\n").slice(1).map(l => {
+        const [start_time, end_time, transport_mode] = l.split("\t")
+        return {
+            start_time: new Date(start_time),
+            end_time: new Date(end_time),
+            transport_mode: transport_mode
+        };
+    });
 }
 
 function usersWithLabels(): string[] {
@@ -68,6 +76,18 @@ function markFileAsProcessed(path: string) {
     fs.appendFileSync(PROCESSED_FILES_PATH, path + "\n", "utf8")
 }
 
+async function addLabels() {
+    const rootPath = path.resolve("./dataset/out/Data");
+    const labeledUsers: UserDoc[] = await findUsers()
+    for (const user of labeledUsers) {
+        console.log(`Prossesing: ${user._id}`)
+        const labels: Labels[] | null = await getLabels(user._id.toString(), rootPath)
+        if(labels !== null){
+            await setTransport(labels, user.activity_ids)
+        }
+    }
+}
+
 async function main() {
     // The root path of our data.
     const rootPath = path.resolve("./dataset/out/Data");
@@ -84,11 +104,10 @@ async function main() {
     });
 
     for (const activity of dataset) {
-        const userHasLabels: boolean = labelList.includes(activity.user);
 
         console.log("Processing:", activity.user, activity.path);
 
-        const user = await addUser(activity.user, userHasLabels)
+        const user = await addUser(activity.user)
         
 
         const content = fs.readFileSync(activity.path, "utf-8")   
@@ -113,7 +132,6 @@ async function main() {
         const a = activity_id.toString()
         await addActivityToUser(activity.user, a);
 
-
         // 2: Create an activity with the trackpoint ids and get the activity ID.
 
         // 3: Create the user if it does not exist and add the activity to it.
@@ -121,6 +139,7 @@ async function main() {
         // If everything went correcly, we write the file as complete to the processed files.
         markFileAsProcessed(activity.path)
     }
+    await addLabels()
 }
 
 main();
