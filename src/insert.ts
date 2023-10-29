@@ -83,7 +83,7 @@ async function addLabels() {
         console.log(`Prossesing: ${user._id}`)
         const labels: Labels[] | null = await getLabels(user._id.toString(), rootPath)
         if(labels !== null){
-            await setTransport(labels, user.activity_ids)
+           await setTransport(labels, user.activity_ids)
         }
     }
 }
@@ -139,7 +139,8 @@ async function main() {
         // If everything went correcly, we write the file as complete to the processed files.
         markFileAsProcessed(activity.path)
     }
-    await addLabels()
 }
 
-main();
+//main();
+
+addLabels()

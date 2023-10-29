@@ -43,17 +43,15 @@ export const setTransport = async (labelList: Labels[], activity_ids: string[]) 
     activities.forEach(async (activity) => {
         //console.log(activity)
         const label = labelList.find(label => {
-            console.log(label.start_time)
-            console.log(activity.start_date_time)
             return (
-                label.start_time.getTime() === (activity.start_date_time.getTime() + 2*3600000 ) &&
-                label.end_time.getTime() === (activity.end_date_time.getTime() + 2*3600000 )
+                label.start_time.getTime() === (activity.start_date_time.getTime()) &&
+                label.end_time.getTime() === (activity.end_date_time.getTime())
             )
         })
         //console.log(label)
         if(label) {
             const updateActive = await Activity.findByIdAndUpdate({'_id': activity._id }, {transportation_mode: label.transport_mode})
-            //console.log(updateActive)
+            console.log(updateActive)
         };
     })
 }
